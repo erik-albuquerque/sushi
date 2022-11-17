@@ -12,7 +12,7 @@ module.exports = {
         red: {
           400: '#DD2E44'
         },
-        grey: {
+        gray: {
           50: '#F2F3F5',
           100: '#E8EAED',
           400: '#7C7C8A',
@@ -22,5 +22,11 @@ module.exports = {
       }
     }
   },
-  plugins: []
+  plugins: [],
+  safelist: [
+    {
+      pattern:
+        /bg-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|viole|purple|fuchsia|pink|rose)-(500)/
+    }
+  ]
 }
