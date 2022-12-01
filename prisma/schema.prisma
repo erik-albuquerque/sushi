@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String        @id @default(uuid())
+  name            String
+  username        String
+  email           String
+  avatarUrl       String?
+  password        String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now())
+  participatingAt Participant[]
+  ownRooms        Room[]
+  ownTracks       Track[]
+
+  @@unique([username, email])
+}
+
+model Room {
+  id           String        @id @default(uuid())
+  title        String
+  private      Boolean       @default(false)
+  password     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
+  ownerId      String
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  participants Participant[]
+  trackQueue   Queue[]
+}
+
+model Participant {
+  id     String @id @default(uuid())
+  userId String
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roomId])
+}
+
+model Queue {
+  id     String  @id @default(uuid())
+  roomId String
+  room   Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tracks Track[]
+}
+
+model Track {
+  id       String @id @default(uuid())
+  title    String
+  url      String
+  ownerId  String
+  queueId  String
+  ownQueue Queue  @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  owner    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+// model Role {
+//   id      String @id @default(uuid())
+//   title   String
+//   ownerId String
+//   user    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+// }
