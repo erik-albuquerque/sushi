@@ -1,10 +1,13 @@
 import { Avatar, Header } from '@components'
-import type { NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
+import { getSession, useSession } from 'next-auth/react'
 
 const Home: NextPage = () => {
+  const { data: session } = useSession()
+
   const user = {
-    name: 'userTest',
-    avatarUrl: '' // 'https://avatars.githubusercontent.com/u/79419167?v=4'
+    name: session?.user?.name ?? '',
+    avatarUrl: session?.user?.image ?? ''
   }
 
   return (
@@ -23,3 +26,22 @@ const Home: NextPage = () => {
 }
 
 export default Home
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getSession({ req })
+
+  if (!session) {
+    res.statusCode = 403
+    return {
+      props: {},
+      redirect: {
+        destination: '/auth/signin',
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: { session }
+  }
+}

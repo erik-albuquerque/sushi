@@ -13,18 +13,22 @@ datasource db {
 
 model User {
   id              String        @id @default(uuid())
-  name            String
-  username        String
-  email           String
-  avatarUrl       String?
-  password        String
+  name            String?
+  username        String?
+  email           String        @unique
+  emailVerified   DateTime?
+  image           String?
+  password        String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @default(now())
   participatingAt Participant[]
   ownRooms        Room[]
   ownTracks       Track[]
+  accounts        Account[]
+  sessions        Session[]
 
   @@unique([username, email])
+  @@map(name: "users")
 }
 
 model Room {
@@ -73,3 +77,44 @@ model Track {
 //   ownerId String
 //   user    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 // }
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
