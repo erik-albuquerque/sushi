@@ -1,28 +1,14 @@
+import { Header } from '@components'
 import { GetServerSideProps } from 'next'
-import { getSession, signIn, signOut, useSession } from 'next-auth/react'
+import { getSession, useSession } from 'next-auth/react'
 
 const SignIn = () => {
   const { data: session } = useSession()
 
   return (
-    <div>
-      <div className="mr-2">
-        {session ? (
-          <button
-            className="p-2 bg-red-500 text-white rounded"
-            onClick={() => signOut()}
-          >
-            logout
-          </button>
-        ) : (
-          <button
-            className="p-2 bg-red-500 text-white rounded"
-            onClick={() => signIn('google')}
-          >
-            login
-          </button>
-        )}
-      </div>
+    <div className="max-w-3xl h-full mx-auto">
+      <Header />
+      {session?.user?.name}
     </div>
   )
 }
