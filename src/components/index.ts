@@ -1,6 +1,7 @@
 export * from './Avatar'
 export * from './Button'
 export * from './Checkbox'
+export * from './Divider'
 export * from './Header'
 export * from './Heading'
 export * from './Logo'
