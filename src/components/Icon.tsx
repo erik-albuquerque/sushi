@@ -8,7 +8,7 @@ type IconProps = IconBaseProps & {
   name: string
 }
 
-const Icon = ({ name, ...props }: IconProps) => {
+const Icon: React.FC<IconProps> = ({ name, ...props }: IconProps) => {
   const icons: { [key: string]: ReactElement } = {
     Google: <FcGoogle {...props} size={30} />,
     Spotify: <FaSpotify {...props} color="#1DB954" />,
