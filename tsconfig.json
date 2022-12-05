@@ -21,7 +21,11 @@
       "@utils/": ["src/utils/*"],
       "@utils": ["src/utils"],
       "@constants/": ["src/constants/*"],
-      "@constants": ["src/constants"]
+      "@constants": ["src/constants"],
+      "@schemas/": ["src/schemas/*"],
+      "@schemas": ["src/schemas"],
+      "@lib/": ["src/lib/*"],
+      "@lib": ["src/lib"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
