@@ -1,1 +1,1 @@
-export * from './NextAuthProviders'
+export * from './next-auth-providers'
