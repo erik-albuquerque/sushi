@@ -26,6 +26,8 @@
       "@schemas": ["src/schemas"],
       "@lib/": ["src/lib/*"],
       "@lib": ["src/lib"],
+      "@types/": ["src/types/*"],
+      "@types": ["src/types"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

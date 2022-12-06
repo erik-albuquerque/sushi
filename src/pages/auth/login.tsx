@@ -9,6 +9,9 @@ import {
   TextInput,
   Tooltip
 } from '@components'
+import { logInSchema } from '@schemas'
+import { FormikLogInInitialValuesTypes } from '@types'
+import { useFormik } from 'formik'
 import { GetServerSideProps } from 'next'
 import {
   ClientSafeProvider,
@@ -17,19 +20,45 @@ import {
   signIn
 } from 'next-auth/react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { Envelope, Lock } from 'phosphor-react'
-import { FormEvent } from 'react'
 
 type LogInProps = {
   providers: ClientSafeProvider[]
 }
 
-const LogIn = ({ providers: objectProviders }: LogInProps) => {
-  const providers = Object.values(objectProviders)
+const LogIn = (props: LogInProps) => {
+  const router = useRouter()
 
-  const handleLogIn = async (event: FormEvent) => {
-    event.preventDefault()
+  const providers = Object.values(props.providers).filter(
+    (provider) => provider.name !== 'Credentials'
+  )
+
+  const onSubmit = async (values: FormikLogInInitialValuesTypes) => {
+    const credentialsResponse = await signIn('credentials', {
+      redirect: false,
+      email: values.email,
+      password: values.password,
+      isRememberMe: values.isRememberMe,
+      callbackUrl: '/'
+    })
+
+    if (credentialsResponse?.ok) {
+      credentialsResponse.url && router.push(credentialsResponse.url)
+    }
   }
+
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      isRememberMe: false
+    } as FormikLogInInitialValuesTypes,
+    onSubmit,
+    validationSchema: logInSchema
+  })
+
+  const formikErrors = formik.errors
 
   return (
     <div className="max-w-3xl h-full mx-auto">
@@ -39,13 +68,13 @@ const LogIn = ({ providers: objectProviders }: LogInProps) => {
 
       <Header />
 
-      <main className="flex flex-col items-center mt-16 mx-8 md:mx-auto">
+      <main className="flex flex-col items-center gap-8 mt-16 mx-8 md:mx-auto">
         <header className="flex flex-col items-center gap-4">
           <Heading className="text-[32px]">Log In</Heading>
           <Text className="text-[18px]">Log in and start using!</Text>
         </header>
 
-        <div className="flex flex-row gap-2 mt-8">
+        <div className="flex flex-row items-center gap-2">
           {providers.length > 0 &&
             providers.map((provider: ClientSafeProvider) => (
               <Tooltip
@@ -54,7 +83,7 @@ const LogIn = ({ providers: objectProviders }: LogInProps) => {
                 label={`Log In with ${provider.name}`}
               >
                 <Button
-                  className="bg-transparent hover:bg-gray-100 flex flex-row items-center gap-2"
+                  className="bg-transparent hover:bg-gray-100 flex items-center"
                   onClick={() => signIn(provider.id)}
                 >
                   <Icon name={provider.name} size={28} />
@@ -63,7 +92,7 @@ const LogIn = ({ providers: objectProviders }: LogInProps) => {
             ))}
         </div>
 
-        <Divider.Root className="mt-8">
+        <Divider.Root>
           <Divider.Line />
           <Text size="sm" className="text-gray-700 uppercase">
             or
@@ -72,54 +101,74 @@ const LogIn = ({ providers: objectProviders }: LogInProps) => {
         </Divider.Root>
 
         <form
-          onSubmit={handleLogIn}
-          className="flex flex-col gap-4 items-stretch w-full max-w-sm mt-8"
+          onSubmit={formik.handleSubmit}
+          className="flex flex-col gap-8 items-stretch w-full max-w-sm"
         >
-          <label htmlFor="email" className="flex flex-col gap-3">
-            <Text className="font-bold text-gray-700 text-base">E-mail</Text>
+          <div className="flex flex-col gap-4 items-stretch w-full">
+            <label htmlFor="email" className="flex flex-col gap-4">
+              <Text className="font-bold text-gray-700 text-base">E-mail</Text>
 
-            <TextInput.Root>
-              <TextInput.Icon>
-                <Envelope />
-              </TextInput.Icon>
+              <TextInput.Root>
+                <TextInput.Icon>
+                  <Envelope />
+                </TextInput.Icon>
 
-              <TextInput.Input
-                id="email"
-                type="email"
-                placeholder="johndoe@example.com"
+                <TextInput.Input
+                  id="email"
+                  type="email"
+                  placeholder="johndoe@example.com"
+                  {...formik.getFieldProps('email')}
+                />
+              </TextInput.Root>
+
+              {formikErrors.email && (
+                <Text className="!text-red-500">{formik.errors.email}</Text>
+              )}
+            </label>
+
+            <label htmlFor="password" className="flex flex-col gap-4">
+              <Text className="font-bold text-gray-700 text-base">
+                Password
+              </Text>
+
+              <TextInput.Root>
+                <TextInput.Icon>
+                  <Lock />
+                </TextInput.Icon>
+                {/* TODO: Implements show password button */}
+                <TextInput.Input
+                  id="password"
+                  type="password"
+                  placeholder="***************"
+                  {...formik.getFieldProps('password')}
+                />
+              </TextInput.Root>
+
+              {formikErrors.password && (
+                <Text className="!text-red-500">{formik.errors.password}</Text>
+              )}
+            </label>
+
+            <label
+              htmlFor="remember"
+              className="flex items-center gap-2 select-none"
+            >
+              {/* TODO: not working! value always false */}
+              <Checkbox
+                id="remember"
+                // checked={formik.values.isRememberMe}
+                // {...formik.getFieldProps('isRememberMe')}
               />
-            </TextInput.Root>
-          </label>
 
-          <label htmlFor="password" className="flex flex-col gap-3">
-            <Text className="font-bold text-gray-700 text-base">Password</Text>
+              <Text className="text-gray-700" size="md">
+                Remember me for 30 days
+              </Text>
+            </label>
+          </div>
 
-            <TextInput.Root>
-              <TextInput.Icon>
-                <Lock />
-              </TextInput.Icon>
+          <Button type="submit">Log In</Button>
 
-              <TextInput.Input
-                id="password"
-                type="password"
-                placeholder="***************"
-              />
-            </TextInput.Root>
-          </label>
-
-          <label htmlFor="remember" className="flex items-center gap-2">
-            <Checkbox id="remember" />
-
-            <Text className="text-gray-700" size="md">
-              Remember me for 30 days
-            </Text>
-          </label>
-
-          <Button type="submit" className="mt-8">
-            Log In
-          </Button>
-
-          <footer className="flex flex-col items-center gap-4 mt-6">
+          <footer className="flex flex-col items-center gap-4">
             <Text asChild size="md">
               <a
                 href=""
