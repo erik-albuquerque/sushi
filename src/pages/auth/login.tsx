@@ -5,6 +5,7 @@ import {
   Header,
   Heading,
   Icon,
+  InputPassword,
   Text,
   TextInput,
   Tooltip
@@ -21,7 +22,7 @@ import {
 } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Envelope, Lock } from 'phosphor-react'
+import { Envelope } from 'phosphor-react'
 
 type LogInProps = {
   providers: ClientSafeProvider[]
@@ -131,18 +132,7 @@ const LogIn = (props: LogInProps) => {
                 Password
               </Text>
 
-              <TextInput.Root>
-                <TextInput.Icon>
-                  <Lock />
-                </TextInput.Icon>
-                {/* TODO: Implements show password button */}
-                <TextInput.Input
-                  id="password"
-                  type="password"
-                  placeholder="***************"
-                  {...formik.getFieldProps('password')}
-                />
-              </TextInput.Root>
+              <InputPassword {...formik.getFieldProps('password')} />
 
               {formikErrors.password && (
                 <Text className="!text-red-500">{formik.errors.password}</Text>
