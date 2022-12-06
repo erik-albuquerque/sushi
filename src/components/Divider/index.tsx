@@ -7,7 +7,10 @@ type DividerRootProps = {
   className?: string
 }
 
-const DividerRoot = ({ children, className }: DividerRootProps) => {
+const DividerRoot: React.FC<DividerRootProps> = ({
+  children,
+  className
+}: DividerRootProps) => {
   return (
     <div
       className={clsx(

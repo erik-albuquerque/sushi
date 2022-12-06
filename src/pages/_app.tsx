@@ -2,12 +2,9 @@ import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import '../styles/global.css'
 
-const App: React.FC<AppProps> = ({
-  Component,
-  pageProps: { session, ...pageProps }
-}: AppProps) => {
+const App: React.FC<AppProps> = ({ Component, pageProps }: AppProps) => {
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={pageProps.session}>
       <Component {...pageProps} />
     </SessionProvider>
   )
