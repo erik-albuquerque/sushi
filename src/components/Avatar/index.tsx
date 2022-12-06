@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
-import { AutoFill, AutoFillProps as AvatarAutoFillProps } from './AutoFill'
-import { AvatarImage, AvatarImageProps } from './AvatarImage'
+import { AvatarAutoFill, AvatarAutoFillProps } from './Avatar-Auto-Fill'
+import { AvatarImage, AvatarImageProps } from './Avatar-Image'
 
 type AvatarRootProps = {
   children: ReactNode
@@ -15,7 +15,7 @@ const AvatarRoot: React.FC<AvatarRootProps> = ({
 const Avatar = {
   Root: AvatarRoot,
   Image: AvatarImage,
-  AutoFill: AutoFill
+  AutoFill: AvatarAutoFill
 }
 
 export type { AvatarRootProps, AvatarImageProps, AvatarAutoFillProps }

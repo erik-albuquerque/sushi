@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
-import { Badge as LogoBadge, BadgeProps as LogoBadgeProps } from './Badge'
-import { LogoSvg } from './LogoSvg'
+import { LogoBadge, LogoBadgeProps } from './Logo-Badge'
+import { LogoSvg } from './Logo-Svg'
 
 type LogoRootProps = {
   children?: ReactNode

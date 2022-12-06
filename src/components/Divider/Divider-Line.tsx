@@ -1,10 +1,10 @@
-type DividerDivider = {
+type DividerLineProps = {
   dark?: boolean
 }
 
-const DividerDivider: React.FC<DividerDivider> = ({
+const DividerLine: React.FC<DividerLineProps> = ({
   dark = true
-}: DividerDivider) => {
+}: DividerLineProps) => {
   return (
     <div
       className={`w-full border-[1px] ${
@@ -14,4 +14,4 @@ const DividerDivider: React.FC<DividerDivider> = ({
   )
 }
 
-export { DividerDivider }
+export { DividerLine }
