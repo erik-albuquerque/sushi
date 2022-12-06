@@ -15,6 +15,27 @@ const handler: NextApiHandler = async (req, res) => {
     return new Date(date + time * 1000)
   }
 
+  const cookies = new Cookies(req, res)
+
+  const THIRTY_DAYS = 30 * 24 * 60 * 60 // 30 days
+  const TWO_HOURS = 2 * 60 * 60 // 2 hours
+
+  let maxAge = TWO_HOURS
+
+  const cookieRememberMe = cookies.get('remember-me')
+  const isRememberMe = req.body.isRememberMe
+
+  if (cookieRememberMe) {
+    maxAge = cookieRememberMe == 'true' ? THIRTY_DAYS : TWO_HOURS
+  } else if (isRememberMe) {
+    maxAge = isRememberMe == 'true' ? THIRTY_DAYS : TWO_HOURS
+
+    cookies.set('remember-me', isRememberMe, {
+      maxAge,
+      path: '/'
+    })
+  }
+
   const callbacks: CallbacksOptions = {
     async signIn({ user }) {
       if (
@@ -24,7 +45,8 @@ const handler: NextApiHandler = async (req, res) => {
       ) {
         if (user) {
           const sessionToken = generateSessionToken()
-          const sessionMaxAge = 60 * 60 * 24 * 30 //30Days
+
+          const sessionMaxAge = maxAge
           const sessionExpiry = fromDate(sessionMaxAge)
 
           await adapter.createSession({
@@ -78,18 +100,17 @@ const handler: NextApiHandler = async (req, res) => {
   const options: NextAuthOptions = {
     session: {
       strategy: 'database',
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-      updateAge: 24 * 60 * 60 // 24 hours
+      maxAge,
+      updateAge: 2 * 60 * 60 // 2 hours
     },
     jwt: {
+      maxAge,
       encode: async ({ token, secret, maxAge }) => {
         if (
           req.query['nextauth']?.includes('callback') &&
           req.query['nextauth']?.includes('credentials') &&
           req.method === 'POST'
         ) {
-          const cookies = new Cookies(req, res)
-
           const cookie = cookies.get('next-auth.session-token')
 
           if (cookie) return cookie
@@ -140,7 +161,7 @@ const handler: NextApiHandler = async (req, res) => {
         name: 'Credentials',
         credentials: {},
         async authorize(credentials) {
-          const { email, password, isRememberMe } =
+          const { email, password } =
             credentials as FormikLogInInitialValuesTypes
 
           const user = await prisma.user.findUnique({
@@ -148,8 +169,6 @@ const handler: NextApiHandler = async (req, res) => {
               email
             }
           })
-
-          console.log('Remember me: ', isRememberMe)
 
           if (!user) {
             throw new Error('No user found with E-mail. Please sign up!')

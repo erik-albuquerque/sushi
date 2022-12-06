@@ -1,6 +1,5 @@
 import {
   Button,
-  Checkbox,
   Divider,
   Header,
   Heading,
@@ -12,7 +11,7 @@ import {
 } from '@components'
 import { logInSchema } from '@schemas'
 import { FormikLogInInitialValuesTypes } from '@types'
-import { useFormik } from 'formik'
+import { Field, Formik } from 'formik'
 import { GetServerSideProps } from 'next'
 import {
   ClientSafeProvider,
@@ -35,6 +34,12 @@ const LogIn = (props: LogInProps) => {
     (provider) => provider.name !== 'Credentials'
   )
 
+  const formikInitialValues = {
+    email: '',
+    password: '',
+    isRememberMe: false
+  } as FormikLogInInitialValuesTypes
+
   const onSubmit = async (values: FormikLogInInitialValuesTypes) => {
     const credentialsResponse = await signIn('credentials', {
       redirect: false,
@@ -48,18 +53,6 @@ const LogIn = (props: LogInProps) => {
       credentialsResponse.url && router.push(credentialsResponse.url)
     }
   }
-
-  const formik = useFormik({
-    initialValues: {
-      email: '',
-      password: '',
-      isRememberMe: false
-    } as FormikLogInInitialValuesTypes,
-    onSubmit,
-    validationSchema: logInSchema
-  })
-
-  const formikErrors = formik.errors
 
   return (
     <div className="max-w-3xl h-full mx-auto">
@@ -101,85 +94,91 @@ const LogIn = (props: LogInProps) => {
           <Divider.Line />
         </Divider.Root>
 
-        <form
-          onSubmit={formik.handleSubmit}
-          className="flex flex-col gap-8 items-stretch w-full max-w-sm"
+        <Formik
+          initialValues={formikInitialValues}
+          onSubmit={onSubmit}
+          validationSchema={logInSchema}
         >
-          <div className="flex flex-col gap-4 items-stretch w-full">
-            <label htmlFor="email" className="flex flex-col gap-4">
-              <Text className="font-bold text-gray-700 text-base">E-mail</Text>
-
-              <TextInput.Root>
-                <TextInput.Icon>
-                  <Envelope />
-                </TextInput.Icon>
-
-                <TextInput.Input
-                  id="email"
-                  type="email"
-                  placeholder="johndoe@example.com"
-                  {...formik.getFieldProps('email')}
-                />
-              </TextInput.Root>
-
-              {formikErrors.email && (
-                <Text className="!text-red-500">{formik.errors.email}</Text>
-              )}
-            </label>
-
-            <label htmlFor="password" className="flex flex-col gap-4">
-              <Text className="font-bold text-gray-700 text-base">
-                Password
-              </Text>
-
-              <InputPassword {...formik.getFieldProps('password')} />
-
-              {formikErrors.password && (
-                <Text className="!text-red-500">{formik.errors.password}</Text>
-              )}
-            </label>
-
-            <label
-              htmlFor="remember"
-              className="flex items-center gap-2 select-none"
+          {(formik) => (
+            <form
+              onSubmit={formik.handleSubmit}
+              className="flex flex-col gap-8 items-stretch w-full max-w-sm"
             >
-              {/* TODO: not working! value always false */}
-              <Checkbox
-                id="remember"
-                // checked={formik.values.isRememberMe}
-                // {...formik.getFieldProps('isRememberMe')}
-              />
+              <div className="flex flex-col gap-4 items-stretch w-full">
+                <label htmlFor="email" className="flex flex-col gap-4">
+                  <Text className="font-bold text-gray-700 text-base">
+                    E-mail
+                  </Text>
 
-              <Text className="text-gray-700" size="md">
-                Remember me for 30 days
-              </Text>
-            </label>
-          </div>
+                  <TextInput.Root>
+                    <TextInput.Icon>
+                      <Envelope />
+                    </TextInput.Icon>
 
-          <Button type="submit">Log In</Button>
+                    <TextInput.Input
+                      id="email"
+                      type="email"
+                      placeholder="johndoe@example.com"
+                      {...formik.getFieldProps('email')}
+                    />
+                  </TextInput.Root>
 
-          <footer className="flex flex-col items-center gap-4">
-            <Text asChild size="md">
-              <a
-                href=""
-                className="text-gray-700 underline hover:text-gray-500"
-              >
-                Forgot your password?
-              </a>
-            </Text>
-            <Text asChild size="md">
-              <span>
-                No account?{' '}
-                <a
-                  href=""
-                  className="text-red-500 underline hover:text-red-400"
+                  {formik.errors.email && (
+                    <Text className="!text-red-500">{formik.errors.email}</Text>
+                  )}
+                </label>
+
+                <label htmlFor="password" className="flex flex-col gap-4">
+                  <Text className="font-bold text-gray-700 text-base">
+                    Password
+                  </Text>
+
+                  <InputPassword {...formik.getFieldProps('password')} />
+
+                  {formik.errors.password && (
+                    <Text className="!text-red-500">
+                      {formik.errors.password}
+                    </Text>
+                  )}
+                </label>
+
+                <label
+                  htmlFor="remember"
+                  className="flex items-center gap-2 select-none"
                 >
-                  Create right now!
-                </a>
-              </span>
-            </Text>
-          </footer>
-        </form>
+                  <Field id="remember" type="checkbox" name="isRememberMe" />
+                  <Text className="text-gray-700" size="md">
+                    Remember me for 30 days
+                  </Text>
+                </label>
+              </div>
+
+              <Button type="submit">Log In</Button>
+
+              <footer className="flex flex-col items-center gap-4">
+                <Text asChild size="md">
+                  <a
+                    href=""
+                    className="text-gray-700 underline hover:text-gray-500"
+                  >
+                    Forgot your password?
+                  </a>
+                </Text>
+                <Text asChild size="md">
+                  <span>
+                    No account?{' '}
+                    <a
+                      href=""
+                      className="text-red-500 underline hover:text-red-400"
+                    >
+                      Create right now!
+                    </a>
+                  </span>
+                </Text>
+              </footer>
+            </form>
+          )}
+        </Formik>
       </main>
     </div>
   )
