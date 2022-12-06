@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 import { ReactNode } from 'react'
-import { DividerDivider } from './DividerDivider'
+import { DividerLine } from './Divider-Line'
 
 type DividerRootProps = {
   children: ReactNode
@@ -25,7 +25,7 @@ const DividerRoot: React.FC<DividerRootProps> = ({
 
 const Divider = {
   Root: DividerRoot,
-  Line: DividerDivider
+  Line: DividerLine
 }
 
 export { Divider }

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
-import { TextInputIcon } from './TextInputIcon'
-import { TextInputInput } from './TextInputInput'
+import { TextInputIcon } from './Text-Input-Icon'
+import { TextInputInput } from './Text-Input-Input'
 
 type TextInputRootProps = {
   children: ReactNode

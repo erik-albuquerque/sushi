@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const LogoSvg = () => {
+const LogoSvg: React.FC = () => {
   return (
     <Link href="/" passHref>
       <a>
