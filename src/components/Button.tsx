@@ -18,7 +18,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <Comp
       className={clsx(
-        'py-3 px-4 bg-red-500 rounded font-semibold text-white text-sm w-full transition-colors hover:bg-red-400',
+        'py-3 px-4 bg-red-500 rounded font-semibold text-white text-sm w-full transition-colors hover:bg-red-400 disabled:bg-red-300 disabled:cursor-not-allowed',
         className
       )}
       {...rest}
