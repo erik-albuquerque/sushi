@@ -5,6 +5,7 @@ import {
   Heading,
   Icon,
   InputPassword,
+  Loading,
   Text,
   TextInput,
   Tooltip
@@ -22,6 +23,7 @@ import {
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Envelope } from 'phosphor-react'
+import { useEffect, useState } from 'react'
 
 type LogInProps = {
   providers: ClientSafeProvider[]
@@ -29,6 +31,7 @@ type LogInProps = {
 
 const LogIn = (props: LogInProps) => {
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   const providers = Object.values(props.providers).filter(
     (provider) => provider.name !== 'Credentials'
@@ -53,6 +56,16 @@ const LogIn = (props: LogInProps) => {
       credentialsResponse.url && router.push(credentialsResponse.url)
     }
   }
+
+  useEffect(() => {
+    router.events.on('routeChangeStart', () => setLoading(true))
+    router.events.on('routeChangeComplete', () => setLoading(false))
+
+    return () => {
+      router.events.off('routeChangeStart', () => setLoading(true))
+      router.events.off('routeChangeComplete', () => setLoading(false))
+    }
+  }, [router.events])
 
   return (
     <div className="max-w-3xl h-full mx-auto">
@@ -153,7 +166,17 @@ const LogIn = (props: LogInProps) => {
                 </label>
               </div>
 
-              <Button type="submit">Log In</Button>
+              <Button
+                type="submit"
+                disabled={loading || formik.isSubmitting}
+                className="flex items-center justify-center"
+              >
+                {loading || formik.isSubmitting ? (
+                  <Loading color="#ffffff" width={20} height={20} />
+                ) : (
+                  'Log in'
+                )}
+              </Button>
 
               <footer className="flex flex-col items-center gap-4">
                 <Text asChild size="md">
