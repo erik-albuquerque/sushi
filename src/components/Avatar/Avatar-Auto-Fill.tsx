@@ -1,4 +1,4 @@
-import { getColorName } from '@utils'
+import { getColorName, getInitialsLetters } from '@utils'
 import { useCallback, useEffect, useState } from 'react'
 
 type AvatarAutoFillProps = {
@@ -11,21 +11,6 @@ const AvatarAutoFill: React.FC<AvatarAutoFillProps> = ({
   user
 }: AvatarAutoFillProps) => {
   const [bgColor, setBgColor] = useState('')
-
-  const getInitialsLetters = (str: string) => {
-    const splitSrt = str.split(' ')
-
-    if (splitSrt.length > 1) {
-      const initials = `${splitSrt[0].split('')[0]}${
-        splitSrt[1].split('')[0]
-      }`.toUpperCase()
-      return initials
-    }
-
-    const initialLetter = splitSrt[0].split('')[0].toUpperCase()
-
-    return initialLetter
-  }
 
   const initialsLetters = getInitialsLetters(user.name)
 

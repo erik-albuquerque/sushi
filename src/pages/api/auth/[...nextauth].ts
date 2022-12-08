@@ -2,7 +2,8 @@ import { NextAuthProviders } from '@constants'
 import { prisma } from '@lib'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { FormikLogInInitialValuesTypes } from '@types'
-import { generateSessionToken } from '@utils'
+import { generateSessionToken, timeFromDate } from '@utils'
+import { compare } from 'bcryptjs'
 import Cookies from 'cookies'
 import { NextApiHandler } from 'next'
 import NextAuth, { CallbacksOptions, NextAuthOptions } from 'next-auth'
@@ -10,10 +11,6 @@ import { decode, encode } from 'next-auth/jwt'
 
 const handler: NextApiHandler = async (req, res) => {
   const adapter = PrismaAdapter(prisma)
-
-  const fromDate = (time: number, date = Date.now()) => {
-    return new Date(date + time * 1000)
-  }
 
   const cookies = new Cookies(req, res)
 
@@ -47,7 +44,7 @@ const handler: NextApiHandler = async (req, res) => {
           const sessionToken = generateSessionToken()
 
           const sessionMaxAge = maxAge
-          const sessionExpiry = fromDate(sessionMaxAge)
+          const sessionExpiry = timeFromDate(sessionMaxAge)
 
           await adapter.createSession({
             sessionToken: sessionToken,
@@ -174,12 +171,10 @@ const handler: NextApiHandler = async (req, res) => {
             throw new Error('No user found with E-mail. Please sign up!')
           }
 
-          // const checkPassword = await compare(
-          //   password,
-          //   user.password ? user.password : ''
-          // )
-
-          const checkPassword = user.password === password
+          const checkPassword = await compare(
+            password,
+            user.password ? user.password : ''
+          )
 
           if (!checkPassword || user.email !== email) {
             throw new Error("Email or Password doesn't match!")

@@ -4,4 +4,11 @@ type FormikLogInInitialValuesTypes = {
   isRememberMe: boolean
 }
 
-export type { FormikLogInInitialValuesTypes }
+type FormikSignUpInitialValuesTypes = {
+  email: string
+  nickname: string
+  password: string
+  confirmPassword: string
+}
+
+export type { FormikLogInInitialValuesTypes, FormikSignUpInitialValuesTypes }

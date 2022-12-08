@@ -1,13 +1,16 @@
 import { Avatar, Header } from '@components'
 import type { GetServerSideProps, NextPage } from 'next'
-import { getSession, useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
+import { getSession } from 'next-auth/react'
 
-const Home: NextPage = () => {
-  const { data: session } = useSession()
+type HomeProps = {
+  session: Session
+}
 
+const Home: NextPage<HomeProps> = (props: HomeProps) => {
   const user = {
-    name: session?.user?.name ?? '',
-    avatarUrl: session?.user?.image ?? ''
+    name: props.session.user?.name ?? '',
+    avatarUrl: props.session.user?.image ?? ''
   }
 
   return (
