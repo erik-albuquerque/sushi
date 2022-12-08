@@ -10,9 +10,10 @@ import {
   TextInput,
   Tooltip
 } from '@components'
-import { logInSchema } from '@schemas'
-import { FormikLogInInitialValuesTypes } from '@types'
-import { Field, Formik } from 'formik'
+import { BASE_URL } from '@constants'
+import { signUpSchema } from '@schemas'
+import { FormikSignUpInitialValuesTypes } from '@types'
+import { Formik } from 'formik'
 import { GetServerSideProps } from 'next'
 import {
   ClientSafeProvider,
@@ -23,51 +24,49 @@ import {
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Envelope } from 'phosphor-react'
+import { Envelope, UserCircle } from 'phosphor-react'
 
-type LogInProps = {
+type SignUpProps = {
   providers: ClientSafeProvider[]
 }
 
-const LogIn = (props: LogInProps) => {
+const SignUp = (props: SignUpProps) => {
   const router = useRouter()
-
   const providers = Object.values(props.providers).filter(
     (provider) => provider.name !== 'Credentials'
   )
 
   const formikInitialValues = {
     email: '',
+    nickname: '',
     password: '',
-    isRememberMe: false
-  } as FormikLogInInitialValuesTypes
+    confirmPassword: ''
+  } as FormikSignUpInitialValuesTypes
 
-  const onSubmit = async (values: FormikLogInInitialValuesTypes) => {
-    const credentialsResponse = await signIn('credentials', {
-      redirect: false,
-      email: values.email,
-      password: values.password,
-      isRememberMe: values.isRememberMe,
-      callbackUrl: '/'
+  const onSubmit = async (values: FormikSignUpInitialValuesTypes) => {
+    await fetch(`${BASE_URL}/api/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values)
     })
-
-    if (credentialsResponse?.ok) {
-      credentialsResponse.url && router.push(credentialsResponse.url)
-    }
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) router.push('/')
+      })
   }
 
   return (
     <div className="max-w-3xl h-full mx-auto">
       <Head>
-        <title>Log In | Sushi</title>
+        <title>Sign Up | Sushi</title>
       </Head>
 
       <Header />
 
       <main className="flex flex-col items-center gap-8 mt-16 mx-8 md:mx-auto">
         <header className="flex flex-col items-center gap-4">
-          <Heading className="text-[32px]">Log In</Heading>
-          <Text className="text-[18px]">Log in and start using!</Text>
+          <Heading className="text-[32px]">Sign Up</Heading>
+          <Text className="text-[18px]">Sign up and enjoy the party!</Text>
         </header>
 
         <div className="flex flex-row items-center gap-2">
@@ -99,7 +98,7 @@ const LogIn = (props: LogInProps) => {
         <Formik
           initialValues={formikInitialValues}
           onSubmit={onSubmit}
-          validationSchema={logInSchema}
+          validationSchema={signUpSchema}
         >
           {(formik) => (
             <form
@@ -109,7 +108,7 @@ const LogIn = (props: LogInProps) => {
               <div className="flex flex-col gap-6 items-stretch w-full">
                 <label htmlFor="email" className="flex flex-col gap-4">
                   <Text className="font-bold text-gray-700 text-base">
-                    E-mail
+                    {`What's your email?`}
                   </Text>
 
                   <TextInput.Root>
@@ -124,15 +123,36 @@ const LogIn = (props: LogInProps) => {
                       {...formik.getFieldProps('email')}
                     />
                   </TextInput.Root>
+                </label>
 
-                  {formik.errors.email && (
-                    <Text className="!text-red-500">{formik.errors.email}</Text>
+                <label htmlFor="nickname" className="flex flex-col gap-4">
+                  <Text className="font-bold text-gray-700 text-base">
+                    What should we call you?
+                  </Text>
+
+                  <TextInput.Root>
+                    <TextInput.Icon>
+                      <UserCircle />
+                    </TextInput.Icon>
+
+                    <TextInput.Input
+                      id="nickname"
+                      type="text"
+                      placeholder="johndoe"
+                      {...formik.getFieldProps('nickname')}
+                    />
+                  </TextInput.Root>
+
+                  {formik.errors.nickname && (
+                    <Text className="!text-red-500">
+                      {formik.errors.nickname}
+                    </Text>
                   )}
                 </label>
 
                 <label htmlFor="password" className="flex flex-col gap-4">
                   <Text className="font-bold text-gray-700 text-base">
-                    Password
+                    Create a password
                   </Text>
 
                   <InputPassword {...formik.getFieldProps('password')} />
@@ -145,13 +165,23 @@ const LogIn = (props: LogInProps) => {
                 </label>
 
                 <label
-                  htmlFor="remember"
-                  className="flex items-center gap-2 select-none"
+                  htmlFor="confirmPassword"
+                  className="flex flex-col gap-4"
                 >
-                  <Field id="remember" type="checkbox" name="isRememberMe" />
-                  <Text className="text-gray-700" size="md">
-                    Remember me for 30 days
+                  <Text className="font-bold text-gray-700 text-base">
+                    Confirm your password
                   </Text>
+
+                  <InputPassword
+                    id="confirmPassword"
+                    {...formik.getFieldProps('confirmPassword')}
+                  />
+
+                  {formik.errors.confirmPassword && (
+                    <Text className="!text-red-500">
+                      {formik.errors.confirmPassword}
+                    </Text>
+                  )}
                 </label>
               </div>
 
@@ -163,25 +193,17 @@ const LogIn = (props: LogInProps) => {
                 {formik.isSubmitting ? (
                   <Loading color="#ffffff" width={20} height={20} />
                 ) : (
-                  'Log in'
+                  'Create Account'
                 )}
               </Button>
 
               <footer className="flex flex-col items-center gap-4">
                 <Text asChild size="md">
-                  <a
-                    href=""
-                    className="text-gray-700 underline hover:text-gray-500"
-                  >
-                    Forgot your password?
-                  </a>
-                </Text>
-                <Text asChild size="md">
                   <span>
-                    No account?{' '}
-                    <Link href="/signup" passHref>
+                    Have an account?{' '}
+                    <Link href="/auth/login" passHref>
                       <a className="text-red-500 underline hover:text-red-400">
-                        Create right now!
+                        Log in
                       </a>
                     </Link>
                   </span>
@@ -195,7 +217,7 @@ const LogIn = (props: LogInProps) => {
   )
 }
 
-export default LogIn
+export default SignUp
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const session = await getSession({ req })
