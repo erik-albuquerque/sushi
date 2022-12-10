@@ -2,6 +2,7 @@ import { Avatar, Header } from '@components'
 import type { GetServerSideProps, NextPage } from 'next'
 import { Session } from 'next-auth'
 import { getSession } from 'next-auth/react'
+import Head from 'next/head'
 
 type HomeProps = {
   session: Session
@@ -15,6 +16,10 @@ const Home: NextPage<HomeProps> = (props: HomeProps) => {
 
   return (
     <div className="max-w-3xl h-full mx-auto">
+      <Head>
+        <title>Home | Sushi</title>
+      </Head>
+
       <Header>
         <Avatar.Root>
           {user.avatarUrl ? (
