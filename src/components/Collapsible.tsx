@@ -33,7 +33,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         </div>
       </RadixCollapsible.Trigger>
 
-      <RadixCollapsible.Content className="flex flex-col gap-2 mt-2 ml-4 w-full">
+      <RadixCollapsible.Content className="flex flex-col gap-2 mt-2 w-full">
         {children}
       </RadixCollapsible.Content>
     </RadixCollapsible.Root>
