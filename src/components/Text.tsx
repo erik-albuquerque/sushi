@@ -20,7 +20,7 @@ const Text: React.FC<TextProps> = ({
   return (
     <Comp
       className={clsx(
-        'text-gray-600 font-sans',
+        'text-gray-700 font-sans',
         {
           'text-xs': size === 'sm',
           'text-sm': size === 'md',
