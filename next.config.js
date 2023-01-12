@@ -6,7 +6,8 @@ const nextConfig = {
     domains: [
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',
-      'i.scdn.co'
+      'i.scdn.co',
+      'yt3.ggpht.com'
     ]
   }
 }

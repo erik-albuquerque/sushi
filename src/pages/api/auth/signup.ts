@@ -20,14 +20,25 @@ export default async function handler(
         return res.status(404).json({ message: "Don't have form data" })
       }
 
-      const userExists = await prisma.user.findUnique({
-        where: {
-          email: data.email
-        }
-      })
+      const [userExists, usernameExists] = await prisma.$transaction([
+        prisma.user.findUnique({
+          where: {
+            email: data.email
+          }
+        }),
+        prisma.user.findFirst({
+          where: {
+            username: data.nickname
+          }
+        })
+      ])
 
       if (userExists) {
         return res.status(422).json({ message: 'User already exists' })
+      }
+
+      if (usernameExists) {
+        return res.status(422).json({ message: 'Username already exists' })
       }
 
       const password = await hash(data.password, 10)

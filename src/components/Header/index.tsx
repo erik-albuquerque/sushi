@@ -7,7 +7,7 @@ type HeaderProps = {
 
 const Header: React.FC<HeaderProps> = ({ children }: HeaderProps) => {
   return (
-    <div className="mx-8 mt-8 flex flex-row justify-between items-center">
+    <div className="mx-8 md:mx-auto mt-8 flex flex-row justify-between items-center">
       <Logo.Root>
         <Logo.Logo />
         <Logo.Badge label="Pre-alpha" />

@@ -1,28 +1,33 @@
-import { Text } from '@components'
-import type { GetServerSideProps } from 'next'
+import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import { Layout } from 'src/layouts'
-import { NextPageWithLayout } from './_app'
+import { NextPageWithLayout } from '../_app'
 
-const Home: NextPageWithLayout = () => {
+const Channel: NextPageWithLayout = () => {
+  const router = useRouter()
+
+  const { channelTitle: title } = router.query
+
   return (
-    <div className="min-h-min sm:ml-[15%] mr-auto flex flex-row items-center">
+    <>
       <Head>
-        <title>Home | Sushi</title>
+        <title>{`#${title} | Sushi`}</title>
       </Head>
 
-      <Text className="text-gray-400">Player will appear here :)</Text>
-    </div>
+      <div className="w-full max-w-lg self-start">
+        {/* player main */}
+        #player
+      </div>
+    </>
   )
 }
 
-Home.getLayout = (page: ReactElement) => {
+Channel.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>
 }
-
-export default Home
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession({ req })
@@ -39,6 +44,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   }
 
   return {
-    props: {}
+    props: { session }
   }
 }
+
+export default Channel

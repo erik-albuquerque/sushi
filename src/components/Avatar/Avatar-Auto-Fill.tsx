@@ -5,14 +5,16 @@ type AvatarAutoFillProps = {
   user: {
     name: string
   }
+  size?: 20 | 30
 }
 
 const AvatarAutoFill: React.FC<AvatarAutoFillProps> = ({
-  user
+  user,
+  size = 30
 }: AvatarAutoFillProps) => {
   const [bgColor, setBgColor] = useState('')
 
-  const initialsLetters = getInitialsLetters(user.name)
+  const initialsLetters = getInitialsLetters(user.name ?? '')
 
   const getColorFromLocalStorage = useCallback(() => {
     const colorName = getColorName()
@@ -36,9 +38,17 @@ const AvatarAutoFill: React.FC<AvatarAutoFillProps> = ({
 
   return (
     <div
-      className={`w-[30px] h-[30px] ${bgColor} rounded-full flex items-center justify-center`}
+      className={`${
+        size === 30 ? 'w-7 h-7' : size === 20 && 'w-6 h-6'
+      } ${bgColor} rounded-full flex items-center justify-center`}
     >
-      <span className="font-bold text-sm text-gray-50">{initialsLetters}</span>
+      <span
+        className={`font-bold ${
+          size === 20 ? 'text-xs' : 'text-sm'
+        } text-gray-50`}
+      >
+        {initialsLetters}
+      </span>
     </div>
   )
 }

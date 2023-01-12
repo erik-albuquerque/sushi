@@ -1,4 +1,6 @@
 const getInitialsLetters = (str: string) => {
+  if (!str) return '#'
+
   const splitSrt = str.split(' ')
 
   if (splitSrt.length > 1) {

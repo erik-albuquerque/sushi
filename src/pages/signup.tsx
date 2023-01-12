@@ -8,6 +8,8 @@ import {
   Loading,
   Text,
   TextInput,
+  Toast,
+  toast,
   Tooltip
 } from '@components'
 import { BASE_URL } from '@constants'
@@ -25,6 +27,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Envelope, UserCircle } from 'phosphor-react'
+import { useEffect, useRef, useState } from 'react'
 
 type SignUpProps = {
   providers: ClientSafeProvider[]
@@ -35,6 +38,9 @@ const SignUp = (props: SignUpProps) => {
   const providers = Object.values(props.providers).filter(
     (provider) => provider.name !== 'Credentials'
   )
+
+  const [isLoading, setIsLoading] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const formikInitialValues = {
     email: '',
@@ -51,9 +57,61 @@ const SignUp = (props: SignUpProps) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data) router.push('/')
+        if (data.user) router.push('/')
+        if (data.message) toast.error(data.message)
       })
   }
+
+  useEffect(() => {
+    let toastId: string
+
+    if (formRef.current) {
+      formRef.current.addEventListener('submit', () => {
+        toastId = toast.loading('Loading...')
+
+        router.events.on('routeChangeStart', () => {
+          toast.success('Successful in creating new account! Login...', {
+            id: toastId
+          })
+          setIsLoading(true)
+        })
+
+        router.events.on('routeChangeComplete', () => {
+          toast.dismiss(toastId)
+          setIsLoading(false)
+        })
+
+        router.events.on('routeChangeError', () => {
+          toast.dismiss(toastId)
+          setIsLoading(false)
+        })
+      })
+    }
+
+    return () => {
+      if (formRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        formRef.current.removeEventListener('submit', () => {
+          router.events.off('routeChangeStart', () => {
+            toast.success('Successful in creating new account! Login...', {
+              id: toastId
+            })
+            setIsLoading(true)
+          })
+
+          router.events.off('routeChangeComplete', () => {
+            toast.dismiss(toastId)
+            setIsLoading(false)
+          })
+
+          router.events.off('routeChangeError', () => {
+            toast.dismiss(toastId)
+            setIsLoading(false)
+          })
+        })
+      }
+    }
+  }, [router.events])
 
   return (
     <div className="max-w-3xl h-full mx-auto">
@@ -104,6 +162,7 @@ const SignUp = (props: SignUpProps) => {
             <form
               onSubmit={formik.handleSubmit}
               className="flex flex-col gap-8 items-stretch w-full max-w-sm"
+              ref={formRef}
             >
               <div className="flex flex-col gap-6 items-stretch w-full">
                 <label htmlFor="email" className="flex flex-col gap-4">
@@ -187,10 +246,10 @@ const SignUp = (props: SignUpProps) => {
 
               <Button
                 type="submit"
-                disabled={formik.isSubmitting}
+                disabled={formik.isSubmitting || isLoading}
                 className="flex items-center justify-center"
               >
-                {formik.isSubmitting ? (
+                {formik.isSubmitting || isLoading ? (
                   <Loading color="#ffffff" width={20} height={20} />
                 ) : (
                   'Create Account'
@@ -212,6 +271,8 @@ const SignUp = (props: SignUpProps) => {
             </form>
           )}
         </Formik>
+
+        <Toast />
       </main>
     </div>
   )
