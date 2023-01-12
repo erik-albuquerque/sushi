@@ -14,7 +14,7 @@ const AvatarAutoFill: React.FC<AvatarAutoFillProps> = ({
 }: AvatarAutoFillProps) => {
   const [bgColor, setBgColor] = useState('')
 
-  const initialsLetters = getInitialsLetters(user.name)
+  const initialsLetters = getInitialsLetters(user.name ?? '')
 
   const getColorFromLocalStorage = useCallback(() => {
     const colorName = getColorName()

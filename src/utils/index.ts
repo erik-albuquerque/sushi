@@ -1,4 +1,6 @@
 export * from './generate-session-token'
 export * from './get-color-name'
 export * from './get-initials-letters'
+export * from './remove-white-space'
+export * from './seconds-to-time-string'
 export * from './time-from-date'
